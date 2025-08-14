@@ -24,7 +24,7 @@ FILES_SOLIBSDEV = ""
 
 PACKAGECONFIG ??= "plugins"
 
-INSANE_SKIP:${PN} += "already-stripped"
+INSANE_SKIP:${PN} += "already-stripped file-rdeps"
 INSANE_SKIP:${PN}-plugins += "file-rdeps"
 
 PACKAGES =+ "${PN}-plugins"
