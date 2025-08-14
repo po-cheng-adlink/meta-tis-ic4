@@ -1,0 +1,114 @@
+This README file contains information on the contents of the meta-tis-ic4 layer.
+
+The meta-tis-ic4 layer provides Yocto/OpenEmbedded recipes for The Imaging Source
+IC4 camera framework, including the core library, GStreamer integration, GenTL
+drivers for various camera interfaces, and a complete image recipe for camera
+applications.
+
+Please see the corresponding sections below for details.
+
+Dependencies
+============
+
+This layer depends on:
+
+  URI: git://git.openembedded.org/bitbake
+  branch: scarthgap
+
+  URI: git://git.openembedded.org/openembedded-core
+  layers: meta
+  branch: scarthgap
+
+  URI: git://git.yoctoproject.org/meta-openembedded
+  layers: meta-oe, meta-multimedia, meta-networking
+  branch: scarthgap
+
+  URI: git://code.qt.io/yocto/meta-qt5.git
+  branch: scarthgap
+
+Layer Contents
+==============
+
+This layer provides the following main components:
+
+Core IC4 Framework:
+  * ic4 - The Imaging Source IC4 core library and plugins
+  * ic4-gstreamer-src - GStreamer elements for IC4 camera integration
+
+GenTL Drivers:
+  * ic4-gentl-driver-usb3vision - USB3 Vision camera driver
+  * ic4-gentl-driver-gigevision - GigE Vision camera driver
+  * ic4-gentl-driver-libcamera - libcamera integration driver
+
+Package Groups:
+  * packagegroup-ic4 - Core IC4 components package group
+  * packagegroup-ic4-gstreamer - IC4 with GStreamer support
+
+Images:
+  * tis-ic4-image - Complete image with IC4 camera support
+
+Patches
+=======
+
+Please submit any patches against the meta-tis-ic4 layer to the appropriate
+mailing list and cc: the maintainer:
+
+Maintainer: The Imaging Source <support@theimagingsource.com>
+
+Table of Contents
+=================
+
+  I. Adding the meta-tis-ic4 layer to your build
+ II. Using IC4 components in your image
+III. Building the TIS IC4 image
+ IV. Runtime dependencies
+
+
+I. Adding the meta-tis-ic4 layer to your build
+=================================================
+
+Run 'bitbake-layers add-layer meta-tis-ic4'
+
+Or manually add the layer to your bblayers.conf:
+  /path/to/meta-tis-ic4 \
+
+II. Using IC4 components in your image
+======================================
+
+To add IC4 support to your existing image, add one of these to your image recipe:
+
+For basic IC4 support:
+  IMAGE_INSTALL += "packagegroup-ic4"
+
+For IC4 with GStreamer integration:
+  IMAGE_INSTALL += "packagegroup-ic4-gstreamer"
+
+For individual components:
+  IMAGE_INSTALL += "ic4 ic4-gentl-driver-usb3vision"
+
+III. Building the TIS IC4 image
+===============================
+
+This layer includes a complete image recipe optimized for camera applications:
+
+  bitbake tis-ic4-image
+
+This image includes:
+  * Complete IC4 framework with all drivers
+  * GStreamer integration
+  * Qt5 support
+  * Camera utilities (v4l-utils, libcamera tools)
+  * Development tools and libraries
+
+IV. Runtime dependencies
+========================
+
+The IC4 framework requires:
+  * Qt5 base libraries
+  * GStreamer 1.0 and plugins (for GStreamer integration)
+  * libusb1 (for USB3Vision cameras)
+  * libcamera (for libcamera integration)
+  * util-linux (for UUID support)
+
+Camera-specific dependencies are automatically handled by the respective
+GenTL driver packages.
