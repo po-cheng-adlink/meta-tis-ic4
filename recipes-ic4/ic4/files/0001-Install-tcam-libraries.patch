@@ -1,0 +1,22 @@
+From 9992d58e1400637245b6ded7e58ce8d07bb56f0a Mon Sep 17 00:00:00 2001
+From: Arne Caspari <arne.caspari@theimagingsource.com>
+Date: Mon, 11 Aug 2025 13:51:57 +0200
+Subject: [PATCH] Install tcam libraries
+
+---
+ src/CMakeLists.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 79e3188..1d1392c 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -74,3 +74,8 @@ set_project_warnings(gstic4src)
+ install(TARGETS gstic4src
+   DESTINATION ${IC4SRC_INSTALL_GST_1_0}
+   COMPONENT bin)
++
++# Install dependency libraries
++install(TARGETS tcamgststatistics tcam-property
++  DESTINATION lib
++  OPTIONAL)  # Use OPTIONAL in case some targets don't exist
