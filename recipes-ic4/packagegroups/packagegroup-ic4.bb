@@ -20,5 +20,4 @@ PACKAGES =+ "\
 
 RDEPENDS:${PN}-gstreamer = "\
     packagegroup-ic4 \
-    ic4-gstreamer-src \
 "
