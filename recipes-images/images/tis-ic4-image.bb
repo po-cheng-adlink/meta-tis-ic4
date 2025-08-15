@@ -38,7 +38,7 @@ IMAGE_LINGUAS = "en-us"
 
 CONMANPKGS ?= "connman connman-plugin-loopback connman-plugin-ethernet connman-plugin-wifi connman-client"
 
-inherit populate_sdk_qt5
+inherit populate_sdk_qt6
 
 #Prefix to the resulting deployable tarball name
 # export IMAGE_BASENAME = "Reference-Camera-Image"
