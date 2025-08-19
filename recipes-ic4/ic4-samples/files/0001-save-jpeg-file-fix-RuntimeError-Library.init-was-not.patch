@@ -1,0 +1,200 @@
+From 81d215e53cec1cf95ad43b4a993085e858b2a213 Mon Sep 17 00:00:00 2001
+From: "po.cheng" <po.cheng@adlinktech.com>
+Date: Mon, 18 Aug 2025 17:20:49 +0800
+Subject: [PATCH] save-jpeg-file: fix RuntimeError(Library.init was not called)
+ when Ctrl+c
+
+Signed-off-by: po.cheng <po.cheng@adlinktech.com>
+---
+ .../save-jpeg-file/save-jpeg-file.py          | 164 +++++++++++++++---
+ 1 file changed, 138 insertions(+), 26 deletions(-)
+
+diff --git a/python/image-acquisition/save-jpeg-file/save-jpeg-file.py b/python/image-acquisition/save-jpeg-file/save-jpeg-file.py
+index ab970b5..2271ce9 100644
+--- a/python/image-acquisition/save-jpeg-file/save-jpeg-file.py
++++ b/python/image-acquisition/save-jpeg-file/save-jpeg-file.py
+@@ -1,43 +1,155 @@
++import imagingcontrol4 as ic4
+ 
++# ---- PySide6 (for 'p' hotkey) ----
++from PySide6.QtWidgets import QApplication
++# If you need these later you can import them too:
++# from PySide6.QtWidgets import QMainWindow, QPushButton, QWidget, QVBoxLayout, QHBoxLayout
++# from PySide6.QtCore import Qt
+ 
+-import imagingcontrol4 as ic4
++def ensure_qapp():
++    """Create or reuse a QApplication instance."""
++    app = QApplication.instance()
++    if app is None:
++        app = QApplication([])
++    return app
+ 
++def open_property_dialog(grabber):
++    """Open IC4 PropertyDialog for the given grabber (modal if possible)."""
++    app = ensure_qapp()
++    # Some versions expose pyside6 under imagingcontrol4.pyside6, others via ic4.pyside6
++    try:
++        dlg = ic4.pyside6.PropertyDialog(grabber, None)
++    except AttributeError:
++        # Fallback import path if needed
++        from imagingcontrol4 import pyside6 as ic4_pyside6
++        dlg = ic4_pyside6.PropertyDialog(grabber, None)
++
++    # Prefer modal (exec). If not available, show and spin a temporary event loop.
++    if hasattr(dlg, "exec"):
++        dlg.exec()
++    else:
++        try:
++            dlg.finished.connect(app.quit)  # type: ignore[attr-defined]
++        except Exception:
++            pass
++        dlg.show()
++        app.exec()
++
++def select_device(device_list):
++    if not device_list:
++        raise RuntimeError("No devices found.")
+ 
+-def example_save_jpeg_file():
+-    device_list = ic4.DeviceEnum.devices()
+     for i, dev in enumerate(device_list):
+         print(f"[{i}] {dev.model_name} ({dev.serial}) [{dev.interface.display_name}]")
+-    print(f"Select device [0..{len(device_list) - 1}]: ", end="")
+-    selected_index = int(input())
+-    dev_info = device_list[selected_index]
+ 
+-    # Open the selected device in a new Grabber
+-    grabber = ic4.Grabber(dev_info)
++    prompt = f"Select device [0..{len(device_list) - 1}] (ENTER=0, q=quit): "
+ 
+-    # Create a snap sink for manual buffer capture
+-    sink = ic4.SnapSink()
++    while True:
++        try:
++            s = input(prompt).strip().lower()
++        except KeyboardInterrupt:
++            print("\nKeyboardInterrupt. Exiting…")
++            return None
+ 
+-    # Start data stream from device to sink
+-    grabber.stream_setup(sink)
++        if s == "":
++            return device_list[0]
++        if s in ("q", "quit"):
++            return None
+ 
+-    for i in range(10):
+-        input("Press ENTER to snap and save a jpeg image")
++        try:
++            idx = int(s)
++            if 0 <= idx < len(device_list):
++                return device_list[idx]
++            else:
++                print(f"Index out of range. Please enter 0..{len(device_list)-1}, ENTER for 0, or 'q' to quit.")
++        except ValueError:
++            print("Invalid input. Please enter a number, ENTER for 0, or 'q' to quit.")
+ 
+-        # Grab the next image buffer
+-        buffer = sink.snap_single(1000)
++def example_save_jpeg_file():
++    device_list = ic4.DeviceEnum.devices()
++    dev_info = select_device(device_list)
++    if dev_info is None:
++        print("No device selected. Bye.")
++        return
+ 
+-        # Save buffer contents in a jpeg file
+-        filename = f"image_{i}.jpeg"
+-        buffer.save_as_jpeg(filename, quality_pct=90)
++    grabber = None
++    sink = None
++    buffer = None
+ 
+-        print(f"Saved image file {filename}")
+-        print()
++    try:
++        grabber = ic4.Grabber(dev_info)
++        sink = ic4.SnapSink()
++        grabber.stream_setup(sink)
+ 
+-    # Only for completeness. Technically this is not necessary here, since the grabber is destroyed at the end of the function.
+-    grabber.stream_stop()
+-    grabber.device_close()
++        i = 0
++        while i < 10:   # cap at 10 images like the original
++            try:
++                user = input(f"Press ENTER to snap ({i+1}/10), 'p' to open Properties, or 'q' to quit: ").strip().lower()
++            except KeyboardInterrupt:
++                print("\nKeyboardInterrupt caught. Cleaning up…")
++                break
+ 
+-if __name__ == "__main__":
+-    with ic4.Library.init_context(api_log_level=ic4.LogLevel.INFO, log_targets=ic4.LogTarget.STDERR):
++            if user == "q":
++                print("Quit requested. Cleaning up…")
++                break
++            if user == "p":
++                # Open IC4 property dialog (blocking until closed)
++                open_property_dialog(grabber)
++                continue  # return to prompt
++
++            # ENTER or anything else → snap
++            buffer = sink.snap_single(1000)  # timeout 1000ms
++            filename = f"image_{i}.jpeg"
++            buffer.save_as_jpeg(filename, quality_pct=90)
++            print(f"Saved image file {filename}\n")
+ 
++            # Release immediately to avoid destructor work after Library deinit
++            try:
++                buffer.release()
++            except Exception:
++                pass
++            buffer = None
++
++            i += 1
++
++        if i >= 10:
++            print("Reached 10 images. Finished.")
++
++    finally:
++        # Defensive cleanup
++        try:
++            if buffer is not None:
++                try:
++                    buffer.release()
++                except Exception:
++                    pass
++                buffer = None
++        except Exception:
++            pass
++
++        try:
++            if grabber is not None:
++                try:
++                    grabber.stream_stop()
++                except Exception:
++                    pass
++        except Exception:
++            pass
++
++        try:
++            if grabber is not None:
++                try:
++                    grabber.device_close()
++                except Exception:
++                    pass
++        except Exception:
++            pass
++
++        del sink
++        del grabber
++
++if __name__ == "__main__":
++    with ic4.Library.init_context(api_log_level=ic4.LogLevel.INFO,
++                                  log_targets=ic4.LogTarget.STDERR):
+         example_save_jpeg_file()
++
+-- 
+2.34.1
+
