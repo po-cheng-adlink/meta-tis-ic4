@@ -12,9 +12,9 @@ RDEPENDS:${PN} = "python3 python3-pyside6"
 S = "${WORKDIR}/git"
 
 do_install() {
-    install -d "${D}/opt"
+    install -d "${D}/opt/${PN}"
     # Recursively copy files and directories, preserving mode and timestamps but not ownership
-    cp -R --no-preserve=ownership ${S}/* ${D}/opt
+    cp -R --no-preserve=ownership ${S}/* ${D}/opt/${PN}/
 }
 
-FILES:${PN} = "/opt"
+FILES:${PN} = "/opt/${PN}"
