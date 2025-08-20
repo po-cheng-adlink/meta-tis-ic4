@@ -28,6 +28,7 @@ PACKAGECONFIG ??= "plugins utils"
 
 INSANE_SKIP:${PN} += "already-stripped file-rdeps"
 INSANE_SKIP:${PN}-plugins += "file-rdeps"
+INSANE_SKIP:${PN}-utils += "file-rdeps"
 
 PACKAGES =+ "${PN}-plugins"
 RDEPENDS:${PN}-plugins += "gstreamer1.0 gstreamer1.0-plugins-base glib-2.0 libgstapp-1.0 mesa freetype libgl-mesa"
