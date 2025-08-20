@@ -8,16 +8,17 @@ inherit packagegroup
 RDEPENDS:${PN} = "\
     ic4 \
     ic4-plugins \
+    ic4-utils \
     ic4-gentl-driver-usb3vision \
     ic4-gentl-driver-gigevision \
-    ic4-gentl-driver-libcamera \
 "
 
 # Optional: Create sub-packages for different configurations
-PACKAGES =+ "\
-    ${PN}-gstreamer \
-"
+# PACKAGES =+ "\
+#     ${PN}-gstreamer \
+# "
 
-RDEPENDS:${PN}-gstreamer = "\
-    packagegroup-ic4 \
-"
+# RDEPENDS:${PN}-gstreamer = "\
+#     packagegroup-ic4 \
+#     ic4-gstreamer-src \
+# "

@@ -16,12 +16,12 @@ IMAGE_NAME = "${MACHINE_NAME}_${IMAGE_BASENAME}"
 COPY_LIC_MANIFEST ?= "1"
 COPY_LIC_DIRS ?= "1"
 
-add_rootfs_version () {
-    printf "${DISTRO_NAME} ${DISTRO_VERSION} (${DISTRO_CODENAME}) \\\n \\\l\n" > ${IMAGE_ROOTFS}/etc/issue
-    printf "${DISTRO_NAME} ${DISTRO_VERSION} (${DISTRO_CODENAME}) %%h\n" > ${IMAGE_ROOTFS}/etc/issue.net
-    printf "${IMAGE_NAME}\n\n" >> ${IMAGE_ROOTFS}/etc/issue
-    printf "${IMAGE_NAME}\n\n" >> ${IMAGE_ROOTFS}/etc/issue.net
-}
+# add_rootfs_version () {
+#     printf "${DISTRO_NAME} ${DISTRO_VERSION} (${DISTRO_CODENAME}) \\\n \\\l\n" > ${IMAGE_ROOTFS}/etc/issue
+#     printf "${DISTRO_NAME} ${DISTRO_VERSION} (${DISTRO_CODENAME}) %%h\n" > ${IMAGE_ROOTFS}/etc/issue.net
+#     printf "${IMAGE_NAME}\n\n" >> ${IMAGE_ROOTFS}/etc/issue
+#     printf "${IMAGE_NAME}\n\n" >> ${IMAGE_ROOTFS}/etc/issue.net
+# }
 
 add_home_root_symlink () {
     ln -sf ${ROOT_HOME} ${IMAGE_ROOTFS}/home/root
@@ -51,20 +51,11 @@ IMAGE_FEATURES += " \
 IMAGE_INSTALL += " \
     packagegroup-boot \
     packagegroup-basic \
-    packagegroup-base-tdx-cli \
-    packagegroup-machine-tdx-cli \
-    packagegroup-wifi-tdx-cli \
-    packagegroup-wifi-fw-tdx-cli \
     udev-extraconf \
     ${CONMANPKGS} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'timestamp-service systemd-analyze', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-analyze', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11 wayland', \
                          'weston-xwayland xterm', '', d)} \
-    ${@bb.utils.contains("MACHINE_FEATURES", "tpm2", "packagegroup-tpm2-tdx-cli", "",d)} \
-    \
-    packagegroup-tdx-cli \
-    packagegroup-tdx-graphical \
-    packagegroup-tdx-qt5 \
     \
     bash \
     coreutils \
@@ -75,5 +66,5 @@ IMAGE_INSTALL += " \
     util-linux \
     v4l-utils \
     \
-    packagegroup-ic4-gstreamer \
+    packagegroup-ic4 \
 "
