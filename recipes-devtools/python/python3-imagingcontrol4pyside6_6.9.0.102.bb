@@ -18,6 +18,9 @@ INSANE_SKIP:${PN} += "file-rdeps"
 RDEPENDS:${PN} = "\
     python3-imagingcontrol4 \
     python3-pyside6 \
+    python3-shiboken6 \
+    python3-pyside6-addons \
+    python3-pyside6-essentials \
 "
 
 #do_pyproject_conf() {
