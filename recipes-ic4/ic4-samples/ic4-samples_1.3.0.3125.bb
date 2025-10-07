@@ -1,5 +1,6 @@
-SUMMARY = "ic4-samples"
-DESCRIPTION = "Samples for ic4 USB camera"
+SUMMARY = "The Imaging Source IC4 examples"
+DESCRIPTION = "Fetches https://github.com/TheImagingSource/ic4-examples and installs it into the default user's home directory."
+HOMEPAGE = "https://github.com/TheImagingSource/ic4-examples"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=76f9b634bc5499ed996452ef6f4456dc"
 
