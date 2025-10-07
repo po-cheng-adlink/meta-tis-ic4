@@ -66,5 +66,6 @@ IMAGE_INSTALL += " \
     util-linux \
     v4l-utils \
     \
-    packagegroup-ic4 \
+    qtwayland qtwayland-plugins \
+    packagegroup-ic4 python3-modules \
 "
