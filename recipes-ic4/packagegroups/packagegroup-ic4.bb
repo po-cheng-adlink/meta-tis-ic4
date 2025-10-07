@@ -9,8 +9,12 @@ RDEPENDS:${PN} = "\
     ic4 \
     ic4-plugins \
     ic4-utils \
+    python3-pyside6 \
+    python3-imagingcontrol4pyside6 \
+    python3-imagingcontrol4 \
     ic4-gentl-driver-usb3vision \
     ic4-gentl-driver-gigevision \
+    ic4-samples \
 "
 
 # Optional: Create sub-packages for different configurations
