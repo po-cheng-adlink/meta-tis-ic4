@@ -9,7 +9,7 @@ SRC_URI = "git://github.com/TheImagingSource/ic4-examples.git;protocol=https;bra
            file://0001-save-jpeg-file-fix-RuntimeError-Library.init-was-not.patch \
           "
 
-RDEPENDS:${PN} = "python3 python3-pyside6"
+RDEPENDS:${PN} = "python3 python3-pyside6 (=6.7.2)"
 S = "${WORKDIR}/git"
 
 do_install() {

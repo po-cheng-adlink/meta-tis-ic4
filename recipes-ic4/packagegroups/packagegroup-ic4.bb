@@ -9,7 +9,7 @@ RDEPENDS:${PN} = "\
     ic4 \
     ic4-plugins \
     ic4-utils \
-    python3-pyside6 \
+    python3-pyside6 (=6.7.2) \
     python3-imagingcontrol4pyside6 \
     python3-imagingcontrol4 \
     ic4-gentl-driver-usb3vision \

@@ -37,7 +37,7 @@ INSANE_SKIP:${PN} += "file-rdeps"
 
 RDEPENDS:${PN} = "\
     python3-numpy \
-    python3-pyside6 \
+    python3-pyside6 (=6.7.2) \
 "
 
 #FILES:${PN} += " \

@@ -17,7 +17,7 @@ SRC_URI = "file://ic4-archive_${PV}~ck_remove-direct-opengl-ref_50f3fdb9_arm64.t
 
 inherit bin_package
 
-RDEPENDS:${PN} += "qtbase libjpeg-turbo tiff fmt pugixml libzip libpng spdlog python3-numpy python3-pyside6"
+RDEPENDS:${PN} += "qtbase libjpeg-turbo tiff fmt pugixml libzip libpng spdlog python3-numpy python3-pyside6 (=6.7.2)"
 
 RPROVIDES:${PN} += "ic4"
 
